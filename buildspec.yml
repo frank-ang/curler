@@ -2,14 +2,23 @@ version: 0.2
 phases:
   pre_build:
     commands:
+      - echo "Logging in to Amazon ECR"
       - $(aws ecr get-login --no-include-email)
+      - REPOSITORY_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
       - TAG="$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
       - IMAGE_URI="${REPOSITORY_URI}:${TAG}"
   build:
     commands:
+      - echo "Build started on `date -u +%FT%TZ` (ISO-8601)"
+      - echo "Building the Docker image"
       - docker build --tag "$IMAGE_URI" .
+      ## docker build -t $IMAGE_REPO_NAME:$(printenv CODEBUILD_BUILD_ID | awk -F':' '{print $2}') .
+
   post_build:
     commands:
+      - echo "Build completed on `date -u +%FT%TZ` (ISO-8601)"
+      - echo "Pushing the Docker image"
+      ##- docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$(printenv CODEBUILD_BUILD_ID | awk -F':' '{print $2}')
       - docker push "$IMAGE_URI"
       - printf '[{"name":"simple-canary","imageUri":"%s"}]' "$IMAGE_URI" > images.json
 artifacts:
