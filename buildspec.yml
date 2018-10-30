@@ -1,8 +1,13 @@
 version: 0.2
 phases:
+  install:
+    commands:
+      - echo Install phase...
+      - apt-get update -y
+      - apt-get install -y curl
+      - apt-get install -y jq
   pre_build:
     commands:
-      - apt-get install -y jq
       - echo "Logging in to Amazon ECR"
       - $(aws ecr get-login --no-include-email)
       - AWS_ACCOUNT_ID=$(aws sts get-caller-identity | jq '.Account' | tr -d '"')
