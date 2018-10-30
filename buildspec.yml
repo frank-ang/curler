@@ -4,12 +4,12 @@ phases:
     commands:
       - echo "Logging in to Amazon ECR"
       - $(aws ecr get-login --no-include-email)
-      - AWS_ACCOUNT_ID=`aws sts get-caller-identity | jq '.Account' | tr -d '"'`
+      - AWS_ACCOUNT_ID=$(aws sts get-caller-identity | jq '.Account' | tr -d '"')
       - REPOSITORY_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
-      - echo "REPOSITORY_URI $REPOSITORY_URI"
+      ## - echo "REPOSITORY_URI $REPOSITORY_URI"
       - TAG="$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
-      - echo "CODEBUILD_RESOLVED_SOURCE_VERSION $CODEBUILD_RESOLVED_SOURCE_VERSION"
-      - echo "CODEBUILD_SOURCE_VERSION $CODEBUILD_SOURCE_VERSION"
+      ##- echo "CODEBUILD_RESOLVED_SOURCE_VERSION $CODEBUILD_RESOLVED_SOURCE_VERSION"
+      ##- echo "CODEBUILD_SOURCE_VERSION $CODEBUILD_SOURCE_VERSION"
       - IMAGE_URI="${REPOSITORY_URI}:${TAG}"
       - echo "IMAGE_URI is $IMAGE_URI"
   build:
