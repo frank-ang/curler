@@ -2,15 +2,12 @@ version: 0.2
 phases:
   install:
     commands:
-      - echo Install phase...
-      - apt-get update -y
-      - apt-get install -y curl
-      - apt-get install -y bionic
+      #- echo Install phase...
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR"
       - $(aws ecr get-login --no-include-email)
-      - AWS_ACCOUNT_ID=$(aws sts get-caller-identity | jq '.Account' | tr -d '"')
+      - AWS_ACCOUNT_ID=$(aws sts get-caller-identity | grep 'Account' | sed 's/[^0-9]*//g')
       - REPOSITORY_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
       ## - echo "REPOSITORY_URI $REPOSITORY_URI"
       - TAG="$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
