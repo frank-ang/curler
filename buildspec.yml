@@ -5,7 +5,7 @@ phases:
       - echo Install phase...
       - apt-get update -y
       - apt-get install -y curl
-      - apt-get install -y jq
+      - apt-get install -y bionic
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR"
