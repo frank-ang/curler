@@ -17,7 +17,7 @@ def canary_main(endpoint):
 
     print ("Begin Loop...")
 
-    while true:
+    while True:
         if datetime.now() > end_time:
             break
         if i>0: # don't sleep on the first iteration.
