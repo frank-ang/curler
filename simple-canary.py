@@ -20,7 +20,7 @@ def canary_main():
         if datetime.now() > end_time:
             break
         print("Calling endpoint: " + args.endpoint)
-        resp = requests.get('https://' + args.endpoint + '/')
+        resp = requests.get('http://' + args.endpoint + '/')
         print (resp)
         time.sleep(args.sleep) # TODO add jitter
     print ("End Loop...")
