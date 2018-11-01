@@ -22,7 +22,8 @@ def canary_main():
         print("Calling endpoint: " + args.endpoint)
         resp = requests.get('http://' + args.endpoint + '/')
         print (resp)
-        time.sleep(args.sleep) # TODO add jitter
+        # TODO add retry backoff?
+        time.sleep(args.sleep)
     print ("End Loop...")
 
 if __name__ == '__main__':
