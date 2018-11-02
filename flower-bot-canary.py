@@ -15,11 +15,15 @@ from datetime import datetime
 from datetime import timedelta
 import argparse
 import requests
+import re
 from aws_requests_auth.aws_auth import AWSRequestsAuth
 from aws_requests_auth.boto_utils import BotoAWSRequestsAuth
 
 def call_api():
-    auth = BotoAWSRequestsAuth(aws_host='hf4bwbbphd.execute-api.us-east-1.amazonaws.com',
+    p = '(?:http.*://)?(?P<host>[^:/ ]+).?(?P<port>[0-9]*).*'
+    m = re.search(p,args.endpoint)
+    hostname = m.group('host')
+    auth = BotoAWSRequestsAuth(aws_host=hostname,
                            aws_region='us-east-1',
                            aws_service='execute-api')
     payload = {'userid':'abc123', 'intent':'I would like to buy flowers.'}
@@ -31,7 +35,6 @@ def canary_main():
     while True:
         if datetime.now() > end_time:
             break
-        print("Calling endpoint: " + args.endpoint)
         call_api()
         time.sleep(args.sleep)
 
@@ -42,7 +45,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description=description
     )
-    parser.add_argument('--endpoint', help='The API endpoint', required=False,
+    parser.add_argument('--endpoint', help='The API endpoint URL', required=False,
                         type=str, default='https://hf4bwbbphd.execute-api.us-east-1.amazonaws.com/TEST/flowers', dest='endpoint')
     parser.add_argument('--sleep', help='Sleep time secs between calls', required=False,
                         type=int, default=60, dest='sleep')
