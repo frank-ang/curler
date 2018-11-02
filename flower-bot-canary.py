@@ -24,7 +24,7 @@ def call_api():
                            aws_service='execute-api')
     payload = {'userid':'abc123', 'intent':'I would like to buy flowers.'}
     response = requests.post(args.endpoint, auth=auth, json=payload)
-    print response.content
+    print(response.content)
 
 def canary_main():
     end_time=datetime.now() + timedelta(hours=args.maxhours)
