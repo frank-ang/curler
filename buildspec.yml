@@ -27,7 +27,6 @@ phases:
       - docker push "$REPOSITORY_URI:latest"
       - docker push "$REPOSITORY_URI:$IMAGE_TAG"
       - printf '[{"name":"simple-canary","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
-      ## was previously: images.json
 
 artifacts:
   files: imagedefinitions.json
