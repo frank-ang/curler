@@ -9,7 +9,7 @@ phases:
       - $(aws ecr get-login --no-include-email)
       - AWS_ACCOUNT_ID=$(aws sts get-caller-identity | grep 'Account' | sed 's/[^0-9]*//g')
       - REPOSITORY_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/curler"
-      - echo "REPOSITORY_URI: $REPOSITORY_URI"
+      - echo "REPOSITORY_URI $REPOSITORY_URI"
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH:=latest}
 
