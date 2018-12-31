@@ -7,6 +7,8 @@ Parameters are set from:
 
 PARAM_PREFIX : e.g. "prod.wordpress.canary." 
     base SSM Parameter namespace for "endpoint" and "sleep" variables
+
+TPS rate maintained using tumbling window across threads within the same process.
 '''
 import argparse
 import boto3
@@ -35,7 +37,7 @@ class Client_Thread(threading.Thread):
     def run(self):
         # Main request loop for each thread
         end_time = datetime.now() + timedelta(hours=args.maxhours)
-        logging.info("Begin Loop., maxhours: {}, end_time: {} ".format(args.maxhours, end_time))
+        logging.info("{}: Begin Loop. maxhours: {}, end_time: {} ".format(self.name, args.maxhours, end_time))
         
         while True:
 
@@ -46,7 +48,8 @@ class Client_Thread(threading.Thread):
             resp = requests.get(args.endpoint)
             if resp.status_code != 200:
                 raise ValueError("Test value error.")
-            logging.debug("{}: Response code: {}, reason: {}".format(self.name, resp.status_code, resp.reason))
+            logging.info("{}: Called endpoint: {}, elapsed seconds: {}, status code: {}, reason: {}" \
+                .format(self.name, args.endpoint, resp.elapsed.total_seconds(), resp.status_code, resp.reason))
             
             current_time = datetime.now()
             global g_timewindow_start
@@ -55,7 +58,8 @@ class Client_Thread(threading.Thread):
             lock.acquire()
 
             if (current_time > g_timewindow_end):
-                logging.info("{}: END of Window: {}".format(self.name, current_time))
+                # reset the tumbling window
+                logging.debug("{}: END of Window from {} until {}".format(self.name, g_timewindow_start, g_timewindow_end))
                 g_timewindow_start = g_timewindow_end
                 g_timewindow_end += timedelta(seconds=TUMBLING_WINDOW_SECS)
                 g_request_count = 0
@@ -68,12 +72,12 @@ class Client_Thread(threading.Thread):
             remaining_requests_all = (args.tps * TUMBLING_WINDOW_SECS) - g_request_count
             remaining_requests_this_thread = float(remaining_requests_all) / args.threads
             sleep_secs = 1
+            actual_tps = g_request_count / time_elapsed
             if remaining_requests_this_thread > 0:
                 sleep_secs = (time_remaining / remaining_requests_this_thread) - resp.elapsed.total_seconds()
-                logging.info("{}: g_request_count: {}, remaining_requests_all: {}, time_remaining: {}, sleep_secs: {}" \
-                    .format(self.name, g_request_count, remaining_requests_all, time_remaining, sleep_secs))
-            actual_tps = g_request_count / time_elapsed
-            logging.info("{}: time_elapsed: {}, actual tps: {}".format(self.name, time_elapsed, actual_tps))
+                logging.debug("{}: time_elapsed: {}, time_remaining: {}, g_request_count: {}, remaining_requests_all: {}, actual_TPS: {}, sleep_secs: {}" \
+                    .format(self.name, time_elapsed, time_remaining, g_request_count, remaining_requests_all, actual_tps, sleep_secs))
+            
             lock.release()
             if sleep_secs >= 0:
                 time.sleep(sleep_secs)
