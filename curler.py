@@ -50,7 +50,9 @@ class Client_Thread(threading.Thread):
                 raise ValueError("Test value error.")
             logging.info("{}: Called endpoint: {}, elapsed seconds: {}, status code: {}, reason: {}" \
                 .format(self.name, args.endpoint, resp.elapsed.total_seconds(), resp.status_code, resp.reason))
-            
+            print("{{ \"endpoint\": \"{}\", \"elapsedseconds\": {}, \"status_code\": {}, \"reason\": \"{}\" }}" \
+                .format( args.endpoint, resp.elapsed.total_seconds(), resp.status_code, resp.reason))
+
             current_time = datetime.now()
             global g_timewindow_start
             global g_timewindow_end
@@ -77,7 +79,7 @@ class Client_Thread(threading.Thread):
                 sleep_secs = (time_remaining / remaining_requests_this_thread) - resp.elapsed.total_seconds()
                 logging.debug("{}: time_elapsed: {}, time_remaining: {}, g_request_count: {}, remaining_requests_all: {}, actual_TPS: {}, sleep_secs: {}" \
                     .format(self.name, time_elapsed, time_remaining, g_request_count, remaining_requests_all, actual_tps, sleep_secs))
-            
+ 
             lock.release()
             if sleep_secs >= 0:
                 time.sleep(sleep_secs)
