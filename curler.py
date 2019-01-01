@@ -37,7 +37,7 @@ class Client_Thread(threading.Thread):
     def run(self):
         # Main request loop for each thread
         end_time = datetime.now() + timedelta(hours=args.maxhours)
-        logging.info("{}: Begin Loop. maxhours: {}, end_time: {} ".format(self.name, args.maxhours, end_time))
+        logging.info("{} Begin Loop. maxhours: {}, end_time: {} ".format(self.name, args.maxhours, end_time))
         
         while True:
 
@@ -48,7 +48,7 @@ class Client_Thread(threading.Thread):
             resp = requests.get(args.endpoint)
             if resp.status_code != 200:
                 raise ValueError("Test value error.")
-            logging.info("{}: endpoint {} elapsed_secs {} status_code {} reason \"{}\"" \
+            logging.info("{} endpoint {} elapsed_secs {} status_code {} reason \"{}\"" \
                 .format(self.name, args.endpoint, resp.elapsed.total_seconds(), resp.status_code, resp.reason))
             #print("{{ \"endpoint\": \"{}\", \"elapsedseconds\": {}, \"status_code\": {}, \"reason\": \"{}\" }}" \
             #    .format( args.endpoint, resp.elapsed.total_seconds(), resp.status_code, resp.reason))
@@ -84,7 +84,7 @@ class Client_Thread(threading.Thread):
             if sleep_secs >= 0:
                 time.sleep(sleep_secs)
 
-        logging.info("End Loop...")
+        logging.info("{} End Loop.".format(self.name))
 
 
 def load_generation_main():
@@ -97,7 +97,7 @@ def load_generation_main():
 
 
 if __name__ == '__main__':
-    LOG_FORMAT = '%(asctime)-15s %(levelname)-6s %(message)s'
+    LOG_FORMAT = '[%(asctime)-15s] %(levelname)-6s %(message)s'
     logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
     logging.info("### Starting Load Tester ###")
 
