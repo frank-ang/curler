@@ -48,10 +48,10 @@ class Client_Thread(threading.Thread):
             resp = requests.get(args.endpoint)
             if resp.status_code != 200:
                 raise ValueError("Test value error.")
-            logging.info("{}: Called endpoint: {}, elapsed seconds: {}, status code: {}, reason: {}" \
+            logging.info("{}: endpoint {} elapsed_secs {} status_code {} reason \"{}\"" \
                 .format(self.name, args.endpoint, resp.elapsed.total_seconds(), resp.status_code, resp.reason))
-            print("{{ \"endpoint\": \"{}\", \"elapsedseconds\": {}, \"status_code\": {}, \"reason\": \"{}\" }}" \
-                .format( args.endpoint, resp.elapsed.total_seconds(), resp.status_code, resp.reason))
+            #print("{{ \"endpoint\": \"{}\", \"elapsedseconds\": {}, \"status_code\": {}, \"reason\": \"{}\" }}" \
+            #    .format( args.endpoint, resp.elapsed.total_seconds(), resp.status_code, resp.reason))
 
             current_time = datetime.now()
             global g_timewindow_start
@@ -97,7 +97,8 @@ def load_generation_main():
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
+    LOG_FORMAT = '%(asctime)-15s %(levelname)-6s %(message)s'
+    logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
     logging.info("### Starting Load Tester ###")
 
     # arguments as CLI parameters
